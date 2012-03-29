@@ -1,1 +1,6 @@
 架空の美少女「あまえびたん」のBOT
+
+
+$ bundle install --path bundle
+
+$ ruby amaebitann.rb
