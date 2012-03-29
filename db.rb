@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # gem install mongo bson_ext json
 require 'bundler/setup'
 require 'mongo'
@@ -37,6 +38,24 @@ module AmaebitannDB
     
     def find_by_tweet id
       collection.find(tweet_id: id).first || nil
+    end
+  end
+
+  class TweetWord < AmaebitannDB::Base
+    def initialize
+      super("tweet_words")
+    end
+
+    def create_word word
+      collection.insert(word: word)
+    end
+    
+    def find_by_word word
+      collection.find(word: word).first || nil
+    end
+
+    def all_words
+      collection.find.map{|w| w["word"]}
     end
   end
 end

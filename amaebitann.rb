@@ -5,7 +5,6 @@ require_relative 'db'
 
 class Amaebitann
   KYAPI = "☆(ゝω・　)v"
-  TWEET = ["びたんびたん！", "ほうほうそれでそれで？", "おはよう！", "それサバンナでも同じ事言えるの？", "ちゅっちゅ", "ありがとう！"]
 
   def initialize
     Twitter.configure do |config|
@@ -16,6 +15,7 @@ class Amaebitann
     end
     
     @already_tweets = AmaebitannDB::AlreadyTweet.new
+    @all_words      = AmaebitannDB::TweetWord.new.all_words
   end
 
   def tweet
@@ -30,7 +30,7 @@ class Amaebitann
   private
   def post mention, str, i
     begin
-      Twitter.update("@#{mention.user.screen_name} #{TWEET.sample} #{KYAPI}#{str*i}")
+      Twitter.update("@#{mention.user.screen_name} #{@all_words.sample} #{KYAPI}#{str*i}")
     rescue Twitter::Error::Forbidden
       post(mention, str, i.next)
     end
