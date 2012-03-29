@@ -1,6 +1,7 @@
 # -*- encoding: UTF-8 -*-
+require 'bundler/setup'
 require 'twitter'
-
+require_relative 'db'
 
 class Amaebitann
   KYAPI = "☆(ゝω・　)v"
@@ -13,28 +14,20 @@ class Amaebitann
       config.oauth_token        = '539087161-U6iMhs3xumxiMOU3tXGhKQQe8Wx6udeKMnyc4qM6'
       config.oauth_token_secret = 'fFVhEVNAr6kYTLwOKxk2NdEMt0mb6HRfBNfb3eUycY'
     end
+    
+    @already_tweets = AmaebitannDB::AlreadyTweet.new
   end
 
-  #暫定的にファイルでツイート管理
   def tweet
-    mentions       = Twitter.mentions
-    already_tweets = get_already_tweets
-    already_file   = open("already_file", "w")
-    
+    mentions = Twitter.mentions
     mentions.each do |mention|
-      post(mention, "  ｷｬﾋﾟ!", 1) unless already_tweets.include?(mention.id)
-      already_file.write("#{mention.id}\n")
+      next unless @already_tweets.find_by_tweet( mention.id ).nil?
+      post(mention, "  ｷｬﾋﾟ!", 1) 
+      @already_tweets.create_tweet( mention.id ) 
     end
-    already_file.close
   end
 
   private
-  def get_already_tweets
-    already_tweets = []
-    open("already_file","r").each{|f| already_tweets << f.strip.to_i}
-    return already_tweets
-  end
-
   def post mention, str, i
     begin
       Twitter.update("@#{mention.user.screen_name} #{TWEET.sample} #{KYAPI}#{str*i}")
